@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eaf2ef">
+  <title>Fieldnote | Scientific Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="wordmark" href="/" aria-label="Fieldnote home"><span class="mark">F</span> FIELDNOTE</a>
+    <span class="masthead-note"><span class="status-dot"></span> SCIENCE, MADE CLEAR</span>
+  </header>
+
+  <main class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="intro-copy">
+        <p class="eyebrow">POLAR SCIENCE OUTREACH / CONTENT STUDIO</p>
+        <h1 id="page-title">From research<br>to <em>something people read.</em></h1>
+        <p class="intro-text">Grounded, editable social content from your research papers. You review every word before it leaves this page.</p>
+      </div>
+      <div class="intro-image" role="img" aria-label="Arctic landscape"></div>
+      <div class="intro-index">01 <span>/</span> 03</div>
+    </section>
+
+    <div class="workbench">
+      <section class="source-panel" aria-labelledby="source-heading">
+        <div class="section-heading">
+          <span class="step-number">01</span>
+          <div><h2 id="source-heading">Bring your source</h2><p>Upload research PDFs and set the direction.</p></div>
+        </div>
+
+        <form id="generate-form">
+          <label class="field-label" for="pdf-files">Research papers <span>PDF, up to 4 MB total</span></label>
+          <label class="dropzone" for="pdf-files" id="dropzone">
+            <span class="upload-symbol" aria-hidden="true">↑</span>
+            <span class="drop-title">Choose PDF files</span>
+            <span class="drop-detail">or drop them here</span>
+            <input id="pdf-files" name="pdfs" type="file" accept="application/pdf,.pdf" multiple required>
+          </label>
+          <ul id="file-list" class="file-list" aria-live="polite"></ul>
+
+          <label class="field-label" for="topic">What should the content focus on?</label>
+          <textarea id="topic" name="topic" rows="4" placeholder="For example: Explain the key findings for a curious, non-specialist audience." required></textarea>
+
+          <label class="field-label" for="app-password">App password <span>set in your Vercel environment variables</span></label>
+          <input id="app-password" name="password" type="password" autocomplete="current-password" placeholder="Your APP_PASSWORD" required>
+
+          <button class="button button-primary generate-button" id="generate-button" type="submit">
+            <span>Generate content</span><span aria-hidden="true">↗</span>
+          </button>
+          <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="result-panel" aria-labelledby="result-heading">
+        <div class="section-heading">
+          <span class="step-number step-coral">02</span>
+          <div><h2 id="result-heading">Shape the story</h2><p>Review and edit before scheduling or posting.</p></div>
+        </div>
+
+        <label class="field-label" for="content">Generated content <span id="result-state">Waiting for a source</span></label>
+        <textarea id="content" class="content-editor" rows="15" placeholder="Your research-based content will appear here." spellcheck="true"></textarea>
+
+        <div class="tweet-heading"><label class="field-label" for="tweet">X post draft</label><span id="tweet-count" class="character-count">0 / 280</span></div>
+        <textarea id="tweet" class="tweet-editor" rows="4" maxlength="280" placeholder="A short version for X. Edit it to your liking."></textarea>
+        <a class="button button-outline x-link is-disabled" id="x-link" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">Review on X <span aria-hidden="true">↗</span></a>
+      </section>
+    </div>
+
+    <section class="schedule-section" aria-labelledby="schedule-heading">
+      <div class="schedule-title">
+        <span class="step-number step-olive">03</span>
+        <div><h2 id="schedule-heading">Keep it on your radar</h2><p>Posts are saved in this browser and reminders appear while this page is open.</p></div>
+      </div>
+      <form id="schedule-form" class="schedule-form">
+        <label for="schedule-date">Date and time</label>
+        <input id="schedule-date" type="datetime-local" required>
+        <button class="button button-secondary" type="submit">Add to queue <span aria-hidden="true">+</span></button>
+      </form>
+      <p id="schedule-status" class="form-status" role="status" aria-live="polite"></p>
+      <div id="queue" class="queue-list" aria-live="polite"></div>
+    </section>
+
+    <footer class="footer"><span>FIELDNOTE / SCIENTIFIC CONTENT STUDIO</span><span>Research first. Human approval always.</span></footer>
+  </main>
+</body>
+</html>
