@@ -6,6 +6,7 @@ import os
 from email.parser import BytesParser
 from email.policy import default
 from http.server import BaseHTTPRequestHandler
+from urllib.request import Request, urlopen
 
 from dotenv import load_dotenv
 from pypdf import PdfReader
@@ -14,6 +15,68 @@ load_dotenv()
 
 MAX_REQUEST_BYTES = 4 * 1024 * 1024 + 64 * 1024
 MAX_TEXT_PER_PDF = 5000
+GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "openai/gpt-oss-20b"
+
+
+def _groq_completion(api_key, messages):
+    request = Request(
+        GROQ_CHAT_COMPLETIONS_URL,
+        data=json.dumps({"model": GROQ_MODEL, "messages": messages, "temperature": 0.2}).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urlopen(request, timeout=22) as response:
+        payload = json.load(response)
+
+    choices = payload.get("choices", [])
+    if not choices:
+        raise ValueError("Groq returned no completion choices.")
+
+    content = choices[0].get("message", {}).get("content")
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("Groq returned an empty completion.")
+    return content.strip()
+
+
+def _generate_content(api_key, topic, pdf_text):
+    research = _groq_completion(
+        api_key,
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You are a scientific research assistant. Analyze only the supplied source. "
+                    "Return a concise analysis with Main topic, Key findings (up to 5 bullets), "
+                    "and Conclusion. Do not invent facts."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"User request:\n{topic}\n\nScientific information:\n{pdf_text}",
+            },
+        ],
+    )
+    return _groq_completion(
+        api_key,
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You create accurate scientific social content using only the supplied analysis. "
+                    "Return a Hook, Post/Caption, Short description, Hashtags, and References. "
+                    "Do not invent facts, numbers, results, or claims. Keep the post suitable for X."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"User request:\n{topic}\n\nResearch analysis:\n{research}",
+            },
+        ],
+    )
 
 
 class handler(BaseHTTPRequestHandler):
@@ -84,12 +147,8 @@ class handler(BaseHTTPRequestHandler):
                 text = "\n".join(page.extract_text() or "" for page in reader.pages)
                 pdf_text += f"\n\n{text[:MAX_TEXT_PER_PDF]}"
 
-            from crew import research_crew
-
-            result = research_crew.kickoff(
-                inputs={"topic": topic, "pdf_text": pdf_text}
-            )
-            self._respond(200, {"content": result.raw})
+            content = _generate_content(os.environ["GROQ_API_KEY"], topic, pdf_text)
+            self._respond(200, {"content": content})
         except Exception:
             logging.exception("Content generation failed")
             self._respond(500, {"error": "Content generation failed. Check the deployment logs."})

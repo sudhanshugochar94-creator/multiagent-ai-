@@ -1,6 +1,6 @@
 # Fieldnote Scientific Content Studio
 
-Generate research-based social content from PDFs, edit it, and prepare a post for X. The static web app and Python generation endpoint are configured for Vercel. `app.py` remains available as the original Streamlit interface for local development.
+Generate research-based social content from PDFs, edit it, and prepare a post for X. The static web app and lightweight Python generation endpoint are configured for Vercel. `app.py` remains available as the original CrewAI-powered Streamlit interface for local development.
 
 ## Deploy to Vercel
 
@@ -10,7 +10,7 @@ Generate research-based social content from PDFs, edit it, and prepare a post fo
    - `APP_PASSWORD`: a long, private password that you choose. The app asks for this password before generating content.
 3. Deploy. Vercel serves `index.html` and exposes the generation endpoint at `/api/generate`.
 
-The generation endpoint accepts PDF uploads totaling up to 4 MB and runs for at most 60 seconds. If CrewAI exceeds the function duration available to your Vercel plan, generation will time out; use a plan with a sufficient function duration or host the AI endpoint on a service designed for longer-running jobs.
+The generation endpoint accepts PDF uploads totaling up to 4 MB and makes two sequential calls to Groq within Vercel's 60-second function limit. The Vercel function calls Groq directly and does not install CrewAI, keeping its deployment bundle small. CrewAI remains a local Streamlit dependency.
 
 Scheduled posts are stored in the current browser's local storage. Reminders appear while the app is open; posts are not sent automatically, and opening the X link still requires human review and confirmation. Queue entries do not sync across browsers or devices.
 

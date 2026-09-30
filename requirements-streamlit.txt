@@ -1,2 +1,3 @@
 -r requirements.txt
+crewai>=0.100.0,<2.0.0
 streamlit>=1.37,<2
