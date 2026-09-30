@@ -3,9 +3,11 @@ import io
 import json
 import logging
 import os
+from pathlib import Path
 from email.parser import BytesParser
 from email.policy import default
 from http.server import BaseHTTPRequestHandler
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from dotenv import load_dotenv
@@ -17,6 +19,13 @@ MAX_REQUEST_BYTES = 4 * 1024 * 1024 + 64 * 1024
 MAX_TEXT_PER_PDF = 5000
 GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "openai/gpt-oss-20b"
+STATIC_FILES = {
+    "/": ("index.html", "text/html; charset=utf-8"),
+    "/index.html": ("index.html", "text/html; charset=utf-8"),
+    "/styles.css": ("styles.css", "text/css; charset=utf-8"),
+    "/script.js": ("script.js", "text/javascript; charset=utf-8"),
+    "/assets/arctic.jpg": ("assets/arctic.jpg", "image/jpeg"),
+}
 
 
 def _groq_completion(api_key, messages):
@@ -82,12 +91,39 @@ def _generate_content(api_key, topic, pdf_text):
 class handler(BaseHTTPRequestHandler):
     def _respond(self, status, payload):
         body = json.dumps(payload).encode("utf-8")
+        self._respond_body(status, "application/json; charset=utf-8", body)
+
+    def _respond_body(self, status, content_type, body, include_body=True):
         self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
         self.end_headers()
-        self.wfile.write(body)
+        if include_body:
+            self.wfile.write(body)
+
+    def _serve_static(self, include_body=True):
+        static_file = STATIC_FILES.get(urlsplit(self.path).path)
+        if static_file is None:
+            self._respond(404, {"error": "Not found."})
+            return
+
+        file_path = Path.cwd() / static_file[0]
+        try:
+            body = file_path.read_bytes()
+        except OSError:
+            logging.exception("Static asset could not be read: %s", static_file[0])
+            self._respond(404, {"error": "Page asset not found."})
+            return
+
+        self._respond_body(200, static_file[1], body, include_body)
+
+    def do_GET(self):
+        self._serve_static()
+
+    def do_HEAD(self):
+        self._serve_static(include_body=False)
 
     def do_POST(self):
         app_password = os.getenv("APP_PASSWORD")

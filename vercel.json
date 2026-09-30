@@ -2,7 +2,8 @@
   "framework": null,
   "functions": {
     "api/*.py": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "{index.html,styles.css,script.js,assets/arctic.jpg}"
     }
   }
 }
