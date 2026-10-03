@@ -2,53 +2,57 @@
 
 # Fieldnote
 
-### Research deserves to be read.
+### From research paper to reader-ready story.
 
-Turn scientific papers into clear, editable content for a wider audience.
-Fieldnote starts with the source, keeps a person in control, and makes it easier
-to shape research into a post worth sharing.
+Scientific work takes care to produce. Sharing it should make room for that
+same care. Fieldnote helps turn research PDFs into clear, editable drafts—with
+the source in view and a human making the final call.
 
-<img src="assets/arctic.jpg" alt="Arctic glacier and mountain landscape" width="720">
+<img src="assets/arctic.jpg" alt="Arctic glacier and mountain landscape" width="100%">
 
-**Upload a paper · Set the focus · Review the draft · Share when ready**
+**SOURCE → FOCUS → DRAFT → HUMAN REVIEW → SHARE**
 
 </div>
 
 ---
 
+## The workflow
+
+```mermaid
+flowchart LR
+    A["1 · Choose a research PDF"] --> B["2 · Add your audience and focus"]
+    B --> C["3 · Send request to Vercel API"]
+    C --> D["Extract PDF text"]
+    D --> E["OpenAI generates a research summary"]
+    E --> F["OpenAI drafts social content"]
+    F --> G["4 · Edit and verify the draft"]
+    G --> H{"Ready to share?"}
+    H -->|"Save a reminder"| I["Browser schedule"]
+    H -->|"Open X draft"| J["Review and post on X yourself"]
+
+    K["OPENAI_API_KEY<br/>Vercel environment only"] -.-> E
+    K -.-> F
+```
+
+> **Your source starts the process. You finish it.** Generated text is editable;
+> Fieldnote does not publish posts automatically.
+
 ## Why Fieldnote
 
-Important research can be difficult to communicate outside its field. Fieldnote
-is a small content studio for turning papers into a first draft that is easier
-to review and adapt—not a replacement for reading the source or applying
-scientific judgment.
+Research can be rigorous and still be hard to communicate beyond a specialist
+audience. Fieldnote gives researchers and science communicators a practical
+place to shape an initial draft from source material, then check every claim
+before it goes anywhere.
 
-The workflow is deliberately human-led: generated copy stays editable, and
-sharing opens a pre-filled X draft for a final review. Nothing is posted
-automatically.
+## At a glance
 
-## What you can do
+| Bring the evidence | Shape the message | Keep control |
+| --- | --- | --- |
+| Upload PDF research papers | Give the draft an audience and focus | Edit before sharing |
+| Up to 4 MB per request | Generate a summary and social copy | Open a pre-filled X draft |
+| Extract text from each PDF | Create a short X version | Save local reminders |
 
-- Upload one or more research PDFs (up to **4 MB total**).
-- Give the generator a specific audience, angle, or instruction.
-- Create a research summary and a social-ready content draft from the supplied
-  material.
-- Edit the full draft and its short X version before sharing.
-- Save post drafts to a schedule in the current browser and revisit them while
-  the page is open.
-- Run the original CrewAI-powered Streamlit interface locally.
-
-## How it works
-
-1. **Add a source.** Upload research PDFs and tell Fieldnote what to focus on.
-2. **Generate a draft.** The Vercel API extracts PDF text and sends it to the
-   configured language model.
-3. **Review and edit.** Refine the generated content and the 280-character X
-   draft yourself.
-4. **Choose what happens next.** Save a reminder locally or open X with the
-   draft ready for your approval.
-
-## Technology
+## Built with
 
 | Area | Implementation |
 | --- | --- |
@@ -58,6 +62,14 @@ automatically.
 | Hosted generation API | OpenAI Chat Completions API (`gpt-4o-mini`) |
 | Original local interface | Streamlit and CrewAI |
 | Local schedule | Browser `localStorage` in the web app |
+
+## Contents
+
+- [The workflow](#the-workflow)
+- [Run the Streamlit app locally](#run-the-streamlit-app-locally)
+- [Deploy the web app to Vercel](#deploy-the-web-app-to-vercel)
+- [Notes and limitations](#notes-and-limitations)
+- [Repository map](#repository-map)
 
 ## Run the Streamlit app locally
 
