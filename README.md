@@ -10,6 +10,8 @@ Generate research-based social content from PDFs, edit it, and prepare a post fo
    - `APP_PASSWORD` (optional): if you want the generation endpoint to be private, set a strong secret here. The browser UI does not ask for it, so the value stays in Vercel and not in the page.
 3. Deploy. Vercel serves `index.html` at `/` and exposes the generation endpoint at `/api/generate`.
 
+If generation reports that the AI service is not configured, add `GROQ_API_KEY` under **Project Settings → Environment Variables** in Vercel, ensure it applies to the deployment environment, and redeploy. Use a valid Groq API key; do not put it in browser code or commit it to this repository.
+
 The generation endpoint accepts PDF uploads totaling up to 4 MB and makes two sequential calls to Groq within Vercel's 60-second function limit. The Vercel function calls Groq directly and does not install CrewAI, keeping its deployment bundle small. CrewAI remains a local Streamlit dependency.
 
 Scheduled posts are stored in the current browser's local storage. Reminders appear while the app is open; posts are not sent automatically, and opening the X link still requires human review and confirmation. Queue entries do not sync across browsers or devices.

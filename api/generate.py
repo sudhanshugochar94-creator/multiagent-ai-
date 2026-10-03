@@ -134,7 +134,10 @@ class handler(BaseHTTPRequestHandler):
                 return
 
         if not os.getenv("GROQ_API_KEY"):
-            self._respond(503, {"error": "The AI service is not configured yet."})
+            self._respond(
+                503,
+                {"error": "Set GROQ_API_KEY in Vercel project settings, then redeploy."},
+            )
             return
 
         try:
