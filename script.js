@@ -6,7 +6,6 @@ const fileInput = document.querySelector("#pdf-files");
 const fileList = document.querySelector("#file-list");
 const dropzone = document.querySelector("#dropzone");
 const topicInput = document.querySelector("#topic");
-const passwordInput = document.querySelector("#app-password");
 const contentInput = document.querySelector("#content");
 const tweetInput = document.querySelector("#tweet");
 const tweetCount = document.querySelector("#tweet-count");
@@ -188,8 +187,8 @@ form.addEventListener("submit", async (event) => {
     setStatus(formStatus, "PDF files must total less than 4 MB.", "error");
     return;
   }
-  if (!topicInput.value.trim() || !passwordInput.value) {
-    setStatus(formStatus, "Add a topic and app password to continue.", "error");
+  if (!topicInput.value.trim()) {
+    setStatus(formStatus, "Add a topic to continue.", "error");
     return;
   }
 
@@ -205,7 +204,6 @@ form.addEventListener("submit", async (event) => {
   try {
     const response = await fetch("/api/generate", {
       method: "POST",
-      headers: { "X-App-Password": passwordInput.value },
       body: payload,
     });
     const data = await response.json();

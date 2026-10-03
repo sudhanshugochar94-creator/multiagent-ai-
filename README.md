@@ -7,7 +7,7 @@ Generate research-based social content from PDFs, edit it, and prepare a post fo
 1. Import this GitHub repository in Vercel and use the repository root as the project root.
 2. Add these environment variables in the Vercel project settings:
    - `GROQ_API_KEY`: an API key from Groq.
-   - `APP_PASSWORD`: a long, private password that you choose. The app asks for this password before generating content.
+   - `APP_PASSWORD` (optional): if you want the generation endpoint to be private, set a strong secret here. The browser UI does not ask for it, so the value stays in Vercel and not in the page.
 3. Deploy. Vercel serves `index.html` at `/` and exposes the generation endpoint at `/api/generate`.
 
 The generation endpoint accepts PDF uploads totaling up to 4 MB and makes two sequential calls to Groq within Vercel's 60-second function limit. The Vercel function calls Groq directly and does not install CrewAI, keeping its deployment bundle small. CrewAI remains a local Streamlit dependency.

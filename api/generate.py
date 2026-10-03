@@ -127,14 +127,11 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         app_password = os.getenv("APP_PASSWORD")
-        if not app_password:
-            self._respond(503, {"error": "The app is not configured yet."})
-            return
-
-        provided_password = self.headers.get("X-App-Password", "")
-        if not hmac.compare_digest(provided_password.encode("utf-8"), app_password.encode("utf-8")):
-            self._respond(401, {"error": "Enter the correct app password."})
-            return
+        if app_password:
+            provided_password = self.headers.get("X-App-Password", "")
+            if not hmac.compare_digest(provided_password.encode("utf-8"), app_password.encode("utf-8")):
+                self._respond(401, {"error": "Enter the correct app password."})
+                return
 
         if not os.getenv("GROQ_API_KEY"):
             self._respond(503, {"error": "The AI service is not configured yet."})
