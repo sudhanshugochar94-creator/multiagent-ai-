@@ -1,3 +1,4 @@
+import hmac
 import io
 import json
 import logging
@@ -6,7 +7,6 @@ from pathlib import Path
 from email.parser import BytesParser
 from email.policy import default
 from http.server import BaseHTTPRequestHandler
-from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
@@ -17,8 +17,8 @@ load_dotenv()
 
 MAX_REQUEST_BYTES = 4 * 1024 * 1024 + 64 * 1024
 MAX_TEXT_PER_PDF = 5000
-OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
-OPENAI_MODEL = "gpt-4o-mini"
+GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "openai/gpt-oss-20b"
 STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -28,48 +28,31 @@ STATIC_FILES = {
 }
 
 
-def _openai_completion(api_key, messages):
+def _groq_completion(api_key, messages):
     request = Request(
-        OPENAI_CHAT_COMPLETIONS_URL,
-        data=json.dumps({"model": OPENAI_MODEL, "messages": messages, "temperature": 0.2}).encode("utf-8"),
+        GROQ_CHAT_COMPLETIONS_URL,
+        data=json.dumps({"model": GROQ_MODEL, "messages": messages, "temperature": 0.2}).encode("utf-8"),
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         },
         method="POST",
     )
-    try:
-        with urlopen(request, timeout=22) as response:
-            payload = json.load(response)
-    except HTTPError as error:
-        if error.code in (401, 403):
-            message = "OpenAI rejected OPENAI_API_KEY. Check that it is valid and active in Vercel, then redeploy."
-        elif error.code == 404:
-            message = "OpenAI could not find the configured model. Check model availability and the deployment logs."
-        elif error.code == 429:
-            message = "OpenAI rate limit or usage quota reached. Check your OpenAI account and try again later."
-        elif error.code == 400:
-            message = "OpenAI rejected the request. Check model availability and the deployment function logs."
-        else:
-            message = f"OpenAI returned HTTP {error.code}. Try again later and check the deployment function logs."
-        raise RuntimeError(message) from error
-    except URLError as error:
-        raise RuntimeError(
-            "Could not connect to OpenAI. Check the deployment function logs and try again."
-        ) from error
+    with urlopen(request, timeout=22) as response:
+        payload = json.load(response)
 
     choices = payload.get("choices", [])
     if not choices:
-        raise ValueError("OpenAI returned no completion choices.")
+        raise ValueError("Groq returned no completion choices.")
 
     content = choices[0].get("message", {}).get("content")
     if not isinstance(content, str) or not content.strip():
-        raise ValueError("OpenAI returned an empty completion.")
+        raise ValueError("Groq returned an empty completion.")
     return content.strip()
 
 
 def _generate_content(api_key, topic, pdf_text):
-    research = _openai_completion(
+    research = _groq_completion(
         api_key,
         [
             {
@@ -86,7 +69,7 @@ def _generate_content(api_key, topic, pdf_text):
             },
         ],
     )
-    return _openai_completion(
+    return _groq_completion(
         api_key,
         [
             {
@@ -143,12 +126,18 @@ class handler(BaseHTTPRequestHandler):
         self._serve_static(include_body=False)
 
     def do_POST(self):
-        api_key = os.getenv("OPENAI_API_KEY", "").strip()
-        if not api_key:
-            self._respond(
-                503,
-                {"error": "Set OPENAI_API_KEY in Vercel project settings, then redeploy."},
-            )
+        app_password = os.getenv("APP_PASSWORD")
+        if not app_password:
+            self._respond(503, {"error": "The app is not configured yet."})
+            return
+
+        provided_password = self.headers.get("X-App-Password", "")
+        if not hmac.compare_digest(provided_password.encode("utf-8"), app_password.encode("utf-8")):
+            self._respond(401, {"error": "Enter the correct app password."})
+            return
+
+        if not os.getenv("GROQ_API_KEY"):
+            self._respond(503, {"error": "The AI service is not configured yet."})
             return
 
         try:
@@ -194,15 +183,11 @@ class handler(BaseHTTPRequestHandler):
                 text = "\n".join(page.extract_text() or "" for page in reader.pages)
                 pdf_text += f"\n\n{text[:MAX_TEXT_PER_PDF]}"
 
-            content = _generate_content(api_key, topic, pdf_text)
+            content = _generate_content(os.environ["GROQ_API_KEY"], topic, pdf_text)
             self._respond(200, {"content": content})
-        except Exception as error:
+        except Exception:
             logging.exception("Content generation failed")
-            if isinstance(error, RuntimeError):
-                message = str(error)
-            else:
-                message = "Could not read the PDF or generate content. Check the PDF and deployment function logs."
-            self._respond(500, {"error": message})
+            self._respond(500, {"error": "Content generation failed. Check the deployment logs."})
 
     def log_message(self, format, *args):
         return

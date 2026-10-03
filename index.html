@@ -48,6 +48,9 @@
           <label class="field-label" for="topic">What should the content focus on?</label>
           <textarea id="topic" name="topic" rows="4" placeholder="For example: Explain the key findings for a curious, non-specialist audience." required></textarea>
 
+          <label class="field-label" for="app-password">App password <span>set in your Vercel environment variables</span></label>
+          <input id="app-password" name="password" type="password" autocomplete="current-password" placeholder="Your APP_PASSWORD" required>
+
           <button class="button button-primary generate-button" id="generate-button" type="submit">
             <span>Generate content</span><span aria-hidden="true">↗</span>
           </button>
