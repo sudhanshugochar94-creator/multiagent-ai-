@@ -17,8 +17,8 @@ load_dotenv()
 
 MAX_REQUEST_BYTES = 4 * 1024 * 1024 + 64 * 1024
 MAX_TEXT_PER_PDF = 5000
-GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "openai/gpt-oss-20b"
+OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
+OPENAI_MODEL = "gpt-4o-mini"
 STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -28,10 +28,10 @@ STATIC_FILES = {
 }
 
 
-def _groq_completion(api_key, messages):
+def _openai_completion(api_key, messages):
     request = Request(
-        GROQ_CHAT_COMPLETIONS_URL,
-        data=json.dumps({"model": GROQ_MODEL, "messages": messages, "temperature": 0.2}).encode("utf-8"),
+        OPENAI_CHAT_COMPLETIONS_URL,
+        data=json.dumps({"model": OPENAI_MODEL, "messages": messages, "temperature": 0.2}).encode("utf-8"),
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -43,33 +43,33 @@ def _groq_completion(api_key, messages):
             payload = json.load(response)
     except HTTPError as error:
         if error.code in (401, 403):
-            message = "Groq rejected GROQ_API_KEY. Check that it is valid and active in Vercel, then redeploy."
+            message = "OpenAI rejected OPENAI_API_KEY. Check that it is valid and active in Vercel, then redeploy."
         elif error.code == 404:
-            message = "Groq could not find the configured model. Check the model availability and deployment logs."
+            message = "OpenAI could not find the configured model. Check model availability and the deployment logs."
         elif error.code == 429:
-            message = "Groq rate limit or usage quota reached. Check your Groq account and try again later."
+            message = "OpenAI rate limit or usage quota reached. Check your OpenAI account and try again later."
         elif error.code == 400:
-            message = "Groq rejected the request. Check model availability and the deployment function logs."
+            message = "OpenAI rejected the request. Check model availability and the deployment function logs."
         else:
-            message = f"Groq returned HTTP {error.code}. Try again later and check the deployment function logs."
+            message = f"OpenAI returned HTTP {error.code}. Try again later and check the deployment function logs."
         raise RuntimeError(message) from error
     except URLError as error:
         raise RuntimeError(
-            "Could not connect to Groq. Check the deployment function logs and try again."
+            "Could not connect to OpenAI. Check the deployment function logs and try again."
         ) from error
 
     choices = payload.get("choices", [])
     if not choices:
-        raise ValueError("Groq returned no completion choices.")
+        raise ValueError("OpenAI returned no completion choices.")
 
     content = choices[0].get("message", {}).get("content")
     if not isinstance(content, str) or not content.strip():
-        raise ValueError("Groq returned an empty completion.")
+        raise ValueError("OpenAI returned an empty completion.")
     return content.strip()
 
 
 def _generate_content(api_key, topic, pdf_text):
-    research = _groq_completion(
+    research = _openai_completion(
         api_key,
         [
             {
@@ -86,7 +86,7 @@ def _generate_content(api_key, topic, pdf_text):
             },
         ],
     )
-    return _groq_completion(
+    return _openai_completion(
         api_key,
         [
             {
@@ -143,11 +143,11 @@ class handler(BaseHTTPRequestHandler):
         self._serve_static(include_body=False)
 
     def do_POST(self):
-        api_key = os.getenv("GROQ_API_KEY", "").strip()
+        api_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not api_key:
             self._respond(
                 503,
-                {"error": "Set GROQ_API_KEY in Vercel project settings, then redeploy."},
+                {"error": "Set OPENAI_API_KEY in Vercel project settings, then redeploy."},
             )
             return
 

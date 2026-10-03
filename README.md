@@ -6,14 +6,14 @@ Generate research-based social content from PDFs, edit it, and prepare a post fo
 
 1. Import this GitHub repository in Vercel and use the repository root as the project root.
 2. Add these environment variables in the Vercel project settings:
-   - `GROQ_API_KEY`: an API key from Groq.
+   - `OPENAI_API_KEY`: an API key from OpenAI with API access and billing/credits enabled.
 3. Deploy. Vercel serves `index.html` at `/` and exposes the generation endpoint at `/api/generate`.
 
-If generation reports that the AI service is not configured, add `GROQ_API_KEY` under **Project Settings → Environment Variables** in Vercel, ensure it applies to the deployment environment, and redeploy. Use a valid Groq API key; do not put it in browser code or commit it to this repository. For errors after deployment, check **Runtime Logs** for the `/api/generate` invocation; build logs only confirm that deployment completed.
+The Vercel generation endpoint uses OpenAI's `gpt-4o-mini` model. Add `OPENAI_API_KEY` under **Project Settings → Environment Variables**, ensure it applies to the deployment environment, and redeploy after adding or changing it. Keep the key server-side; do not put it in browser code or commit it to this repository. For runtime errors, check **Runtime Logs** for the `/api/generate` invocation; build logs only confirm that deployment completed.
 
 The generation endpoint does not use an app password and is publicly callable when the deployment is public. If access should be restricted, enable Vercel Deployment Protection for the project.
 
-The generation endpoint accepts PDF uploads totaling up to 4 MB and makes two sequential calls to Groq within Vercel's 60-second function limit. The Vercel function calls Groq directly and does not install CrewAI, keeping its deployment bundle small. CrewAI remains a local Streamlit dependency.
+The generation endpoint accepts PDF uploads totaling up to 4 MB and makes two sequential calls to OpenAI within Vercel's 60-second function limit. The Vercel function calls OpenAI directly and does not install CrewAI, keeping its deployment bundle small. The original local Streamlit interface remains separate and uses its configured CrewAI provider.
 
 Scheduled posts are stored in the current browser's local storage. Reminders appear while the app is open; posts are not sent automatically, and opening the X link still requires human review and confirmation. Queue entries do not sync across browsers or devices.
 
@@ -27,7 +27,7 @@ python -m venv .venv
 pip install -r requirements-streamlit.txt
 ```
 
-Create a `.env` file in the project root with `GROQ_API_KEY`, then run the original Streamlit interface:
+Create a `.env` file in the project root with `GROQ_API_KEY` for the original local Streamlit interface, then run it:
 
 ```powershell
 streamlit run streamlit_app.py
