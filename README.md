@@ -7,10 +7,11 @@ Generate research-based social content from PDFs, edit it, and prepare a post fo
 1. Import this GitHub repository in Vercel and use the repository root as the project root.
 2. Add these environment variables in the Vercel project settings:
    - `GROQ_API_KEY`: an API key from Groq.
-   - `APP_PASSWORD` (optional): if you want the generation endpoint to be private, set a strong secret here. The browser UI does not ask for it, so the value stays in Vercel and not in the page.
 3. Deploy. Vercel serves `index.html` at `/` and exposes the generation endpoint at `/api/generate`.
 
 If generation reports that the AI service is not configured, add `GROQ_API_KEY` under **Project Settings → Environment Variables** in Vercel, ensure it applies to the deployment environment, and redeploy. Use a valid Groq API key; do not put it in browser code or commit it to this repository.
+
+The generation endpoint does not use an app password and is publicly callable when the deployment is public. If access should be restricted, enable Vercel Deployment Protection for the project.
 
 The generation endpoint accepts PDF uploads totaling up to 4 MB and makes two sequential calls to Groq within Vercel's 60-second function limit. The Vercel function calls Groq directly and does not install CrewAI, keeping its deployment bundle small. CrewAI remains a local Streamlit dependency.
 
@@ -26,7 +27,7 @@ python -m venv .venv
 pip install -r requirements-streamlit.txt
 ```
 
-Create a `.env` file in the project root with `GROQ_API_KEY` and `APP_PASSWORD`, then run the original Streamlit interface:
+Create a `.env` file in the project root with `GROQ_API_KEY`, then run the original Streamlit interface:
 
 ```powershell
 streamlit run streamlit_app.py

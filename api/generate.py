@@ -1,4 +1,3 @@
-import hmac
 import io
 import json
 import logging
@@ -126,13 +125,6 @@ class handler(BaseHTTPRequestHandler):
         self._serve_static(include_body=False)
 
     def do_POST(self):
-        app_password = os.getenv("APP_PASSWORD")
-        if app_password:
-            provided_password = self.headers.get("X-App-Password", "")
-            if not hmac.compare_digest(provided_password.encode("utf-8"), app_password.encode("utf-8")):
-                self._respond(401, {"error": "Enter the correct app password."})
-                return
-
         if not os.getenv("GROQ_API_KEY"):
             self._respond(
                 503,
