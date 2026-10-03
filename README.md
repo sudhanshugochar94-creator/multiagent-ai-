@@ -9,7 +9,7 @@ Generate research-based social content from PDFs, edit it, and prepare a post fo
    - `GROQ_API_KEY`: an API key from Groq.
 3. Deploy. Vercel serves `index.html` at `/` and exposes the generation endpoint at `/api/generate`.
 
-If generation reports that the AI service is not configured, add `GROQ_API_KEY` under **Project Settings → Environment Variables** in Vercel, ensure it applies to the deployment environment, and redeploy. Use a valid Groq API key; do not put it in browser code or commit it to this repository.
+If generation reports that the AI service is not configured, add `GROQ_API_KEY` under **Project Settings → Environment Variables** in Vercel, ensure it applies to the deployment environment, and redeploy. Use a valid Groq API key; do not put it in browser code or commit it to this repository. For errors after deployment, check **Runtime Logs** for the `/api/generate` invocation; build logs only confirm that deployment completed.
 
 The generation endpoint does not use an app password and is publicly callable when the deployment is public. If access should be restricted, enable Vercel Deployment Protection for the project.
 

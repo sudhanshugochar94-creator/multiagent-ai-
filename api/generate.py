@@ -6,6 +6,7 @@ from pathlib import Path
 from email.parser import BytesParser
 from email.policy import default
 from http.server import BaseHTTPRequestHandler
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
@@ -37,8 +38,25 @@ def _groq_completion(api_key, messages):
         },
         method="POST",
     )
-    with urlopen(request, timeout=22) as response:
-        payload = json.load(response)
+    try:
+        with urlopen(request, timeout=22) as response:
+            payload = json.load(response)
+    except HTTPError as error:
+        if error.code in (401, 403):
+            message = "Groq rejected GROQ_API_KEY. Check that it is valid and active in Vercel, then redeploy."
+        elif error.code == 404:
+            message = "Groq could not find the configured model. Check the model availability and deployment logs."
+        elif error.code == 429:
+            message = "Groq rate limit or usage quota reached. Check your Groq account and try again later."
+        elif error.code == 400:
+            message = "Groq rejected the request. Check model availability and the deployment function logs."
+        else:
+            message = f"Groq returned HTTP {error.code}. Try again later and check the deployment function logs."
+        raise RuntimeError(message) from error
+    except URLError as error:
+        raise RuntimeError(
+            "Could not connect to Groq. Check the deployment function logs and try again."
+        ) from error
 
     choices = payload.get("choices", [])
     if not choices:
@@ -125,7 +143,8 @@ class handler(BaseHTTPRequestHandler):
         self._serve_static(include_body=False)
 
     def do_POST(self):
-        if not os.getenv("GROQ_API_KEY"):
+        api_key = os.getenv("GROQ_API_KEY", "").strip()
+        if not api_key:
             self._respond(
                 503,
                 {"error": "Set GROQ_API_KEY in Vercel project settings, then redeploy."},
@@ -175,11 +194,15 @@ class handler(BaseHTTPRequestHandler):
                 text = "\n".join(page.extract_text() or "" for page in reader.pages)
                 pdf_text += f"\n\n{text[:MAX_TEXT_PER_PDF]}"
 
-            content = _generate_content(os.environ["GROQ_API_KEY"], topic, pdf_text)
+            content = _generate_content(api_key, topic, pdf_text)
             self._respond(200, {"content": content})
-        except Exception:
+        except Exception as error:
             logging.exception("Content generation failed")
-            self._respond(500, {"error": "Content generation failed. Check the deployment logs."})
+            if isinstance(error, RuntimeError):
+                message = str(error)
+            else:
+                message = "Could not read the PDF or generate content. Check the PDF and deployment function logs."
+            self._respond(500, {"error": message})
 
     def log_message(self, format, *args):
         return
