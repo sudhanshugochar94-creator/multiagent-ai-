@@ -1,468 +1,566 @@
-# Fieldnote
+<div align="center">
+
+# 🔬 Fieldnote
 
 ### Turn research papers into clear, shareable science content.
 
-Fieldnote is a small scientific-content studio built to make research papers easier to understand and easier to communicate.
+**Read the paper. Understand the research. Create the draft. Stay in control.**
 
-You give it one or more research PDFs and a topic or focus. Fieldnote extracts the relevant text, sends it through a research-first generation process, and produces an editable draft that can be turned into a short social post.
+Fieldnote is a scientific-content studio that takes research papers and helps turn them into clear, editable content for social media — while keeping the final review and publishing decision with the user.
 
-The important part is that **Fieldnote does not publish anything automatically**. The generated content is only a starting point. You review it, edit it, and decide what you want to share.
+<br>
 
----
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Serverless-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-API-F55036?style=for-the-badge)
+![CrewAI](https://img.shields.io/badge/CrewAI-Agents-000000?style=for-the-badge)
+![Streamlit](https://img.shields.io/badge/Streamlit-Local_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 
-## ✨ What Fieldnote Does
-
-Research papers are often difficult to turn into something that is short, clear, and understandable without losing the important details.
-
-Fieldnote handles that first pass.
-
-**The basic flow is:**
-
-`Research PDF → Extract Text → Research Analysis → Content Draft → Human Review → Share`
-
-You can:
-
-- Upload one or more research PDFs
-- Add a topic, question, or writing focus
-- Generate a research-based explanation
-- Turn the explanation into social-media-friendly content
-- Edit the generated draft
-- Edit a shorter X/Twitter version
-- Save a browser reminder
-- Open X with the post already filled in
-- Decide yourself whether to publish it
-
-> Fieldnote is designed to assist with scientific communication, not replace reading the original research paper or checking scientific claims.
+</div>
 
 ---
 
-## 📸 Screenshots
+## ✦ What is Fieldnote?
 
-### Main Interface
+Research papers contain a lot of useful information, but turning that information into something people can actually read and understand is another problem.
 
-<!-- Replace this path with your actual screenshot -->
+**Fieldnote handles that first step.**
 
-![Fieldnote Interface](docs/images/fieldnote-interface.png)
+Upload a research PDF, tell Fieldnote what you want to focus on, and it creates a research-based draft that you can review and edit before sharing.
 
-The interface is intentionally simple: upload the paper, provide the focus, generate the draft, then review and edit the result.
+```text
+                 ┌──────────────────┐
+                 │   Research Paper  │
+                 │       PDF         │
+                 └────────┬─────────┘
+                          │
+                          ▼
+                 ┌──────────────────┐
+                 │  Extract & Read  │
+                 │      Paper       │
+                 └────────┬─────────┘
+                          │
+                          ▼
+                 ┌──────────────────┐
+                 │ Research Analysis│
+                 └────────┬─────────┘
+                          │
+                          ▼
+                 ┌──────────────────┐
+                 │  Content Draft   │
+                 └────────┬─────────┘
+                          │
+                          ▼
+                 ┌──────────────────┐
+                 │  Human Review    │
+                 │   & Editing      │
+                 └────────┬─────────┘
+                          │
+                          ▼
+                    Share if ready
+```
+
+The goal isn't to replace the paper.
+
+It's to make the **paper → explanation → communication** process easier.
 
 ---
 
-### Generated Research Content
+## ⚡ What You Can Do
 
-![Generated Content](docs/images/generated-content.png)
+| | Feature |
+|---|---|
+| 📄 | Upload one or more research PDFs |
+| 🎯 | Give a topic, question, or focus |
+| 🧠 | Generate a research-focused analysis |
+| ✍️ | Turn the analysis into readable content |
+| 📝 | Edit the generated draft |
+| 𝕏 | Prepare a shorter X post |
+| 🔔 | Save a browser reminder |
+| 👤 | Review everything before publishing |
 
-The generated output is editable. Fieldnote does not lock the user into the model's response.
+There is **no automatic publishing**.
+
+Fieldnote prepares the content. **You decide what gets shared.**
 
 ---
 
-### X Post Preview
+# 🖥️ The Web App
 
-![X Post Preview](docs/images/x-post-preview.png)
+<div align="center">
 
-A shorter version can be prepared for X and opened with the content pre-filled.
+### Upload → Generate → Edit → Share
+
+</div>
+
+**Add your actual application screenshot below.**
+
+> 📸 **SCREENSHOT — Add your Fieldnote UI screenshot here**
+
+For GitHub, upload your screenshot to:
+
+```text
+docs/images/fieldnote-ui.png
+```
+
+Then replace the placeholder above with:
+
+```markdown
+<div align="center">
+<img src="docs/images/fieldnote-ui.png" width="900">
+</div>
+```
 
 ---
 
 # 🔄 How Fieldnote Works
 
-The hosted version follows a fairly straightforward pipeline.
+The hosted application has a simple pipeline.
 
 ```text
-                    ┌──────────────────────┐
-                    │    Research PDFs     │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │     Browser UI       │
-                    │   HTML / CSS / JS    │
-                    └──────────┬───────────┘
-                               │
-                         Topic / Focus
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │    /api/generate     │
-                    │    Python / Vercel   │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │       pypdf          │
-                    │   Extract PDF text   │
-                    └──────────┬───────────┘
-                               │
-                       Max 5,000 chars
-                         per PDF
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │      Groq API        │
-                    │ openai/gpt-oss-20b   │
-                    └──────────┬───────────┘
-                               │
-                      Research Analysis
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │      Groq API        │
-                    │ openai/gpt-oss-20b   │
-                    └──────────┬───────────┘
-                               │
-                       Content Draft
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │     Browser UI       │
-                    │ Edit + Review + X    │
-                    └──────────────────────┘
-```
-
-### Workflow Diagram
-
-For the repository, I recommend adding your detailed architecture image here:
-
-![Fieldnote Workflow](docs/images/fieldnote-workflow.png)
-
-**Suggested diagram structure:**
-
-```text
-USER
- │
- │ Upload PDFs + Topic
- ▼
-FIELDNOTE WEB APP
- │
- ▼
-PDF VALIDATION
- │
- │ ≤ 4 MB total
- ▼
-VERCEL PYTHON API
- │
- ▼
-PYPDF
- │
- │ Extract text
- │
- │ ≤ 5,000 chars / PDF
- ▼
-RESEARCH ANALYSIS
- │
- │ Groq
- │ openai/gpt-oss-20b
- ▼
-CONTENT GENERATION
- │
- │ Groq
- │ openai/gpt-oss-20b
- ▼
-EDITABLE DRAFT
- │
- ├───────────────┐
- ▼               ▼
-LONG FORM       X POST
- │               │
- ▼               ▼
-USER REVIEW     USER REVIEW
- │               │
- └───────┬───────┘
-         ▼
-      OPEN X
-         │
-         ▼
-   USER DECIDES
-   WHETHER TO POST
+┌─────────────────────────────────────────────────────────────┐
+│                         USER                                │
+│                                                             │
+│       Upload PDF + Enter topic / research focus             │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      BROWSER APP                            │
+│                   HTML / CSS / JavaScript                   │
+│                                                             │
+│              PDF size validation ≤ 4 MB                     │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             │ POST /api/generate
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    VERCEL PYTHON API                        │
+│                                                             │
+│                    api/generate.py                           │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                          pypdf                               │
+│                                                             │
+│                 Extract text from PDFs                      │
+│                 Maximum 5,000 chars / PDF                   │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                       GROQ API                              │
+│                                                             │
+│                    gpt-oss-20b                              │
+│                                                             │
+│                 Research Analysis                           │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                       GROQ API                              │
+│                                                             │
+│                    gpt-oss-20b                              │
+│                                                             │
+│                  Content Generation                         │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      FIELDNOTE UI                           │
+│                                                             │
+│          Edit Draft → Edit X Post → Review                  │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+                      USER DECIDES
+                    WHETHER TO SHARE
 ```
 
 ---
 
-# 🧠 Generation Pipeline
+# 🧩 Architecture
 
-Fieldnote intentionally separates **research analysis** from **content writing**.
+<div align="center">
 
-Instead of directly asking the model:
+### Fieldnote Web Architecture
 
-> "Write a social media post from this paper."
+</div>
 
-the hosted application uses two generation steps.
+```text
+                         FIELDNOTE
+                             │
+                             │
+                ┌────────────┴────────────┐
+                │                         │
+                ▼                         ▼
+          WEB APPLICATION          LOCAL APPLICATION
+                │                         │
+                │                         │
+       HTML / CSS / JS              Streamlit
+                │                         │
+                ▼                         ▼
+        Vercel Python API              CrewAI
+                │                         │
+                ▼                         ▼
+              pypdf                 Research Agent
+                │                         │
+                │                         ▼
+                │                  Content Agent
+                │                         │
+                └────────────┬────────────┘
+                             │
+                             ▼
+                         GROQ API
+                             │
+                             ▼
+                     gpt-oss-20b
+```
 
-### 1. Research Analysis
+---
 
-The extracted paper text and the user's focus are sent to the first model request.
+## 🧠 Why Two AI Steps?
 
-Its job is to identify and understand the relevant information from the supplied research.
+Fieldnote doesn't directly throw the PDF at the model and ask:
 
-The prompt is designed to keep the response grounded in the supplied material rather than encouraging unsupported claims.
+```text
+"Write a social media post."
+```
 
-### 2. Content Generation
+Instead, the hosted version separates the process into two steps.
 
-The research analysis is then passed into a second model request.
+### Step 1 — Research
 
-This step turns the analysis into a readable content draft.
+The first model call looks at the extracted research text and the user's focus.
 
-The separation makes the workflow easier to reason about:
+Its job is to understand the supplied research and identify the information that matters.
 
 ```text
 PDF
- │
- ▼
-Extracted Research
- │
- ▼
+ ↓
+Extracted Text
+ ↓
 Research Analysis
- │
- ▼
-Content Draft
 ```
 
-The generated content is still reviewed by the user before it is shared.
+### Step 2 — Content
+
+The second model call takes that research analysis and turns it into a readable content draft.
+
+```text
+Research Analysis
+       ↓
+Content Generation
+       ↓
+Editable Draft
+```
+
+This keeps the research-reading step separate from the writing step.
 
 ---
 
 # 🛠️ Tech Stack
 
-## Web Application
+<div align="center">
 
-| Technology | Used For |
+### Built with a lightweight web stack + AI workflow
+
+</div>
+
+```text
+┌───────────────────────────────────────────────────────────┐
+│                       FIELDNOTE                           │
+├───────────────────────────────────────────────────────────┤
+│                                                           │
+│  FRONTEND              BACKEND             AI             │
+│                                                           │
+│  HTML                  Python              Groq           │
+│  CSS                   Vercel              gpt-oss-20b    │
+│  JavaScript            pypdf                              │
+│                                                           │
+├───────────────────────────────────────────────────────────┤
+│                                                           │
+│  LOCAL VERSION                                           │
+│                                                           │
+│  Streamlit  +  CrewAI  +  Groq                           │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+### Technologies
+
+| Technology | Role |
 |---|---|
-| HTML | Application structure |
-| CSS | Layout and visual design |
-| JavaScript | Browser-side application logic |
-| Python | Backend API |
-| Vercel | Hosting / serverless API |
-| pypdf | PDF text extraction |
-| Groq API | LLM inference |
-| openai/gpt-oss-20b | Generation model |
-| localStorage | Browser-side reminders |
-
-## Local Version
-
-| Technology | Used For |
-|---|---|
-| Streamlit | Local application UI |
-| CrewAI | Agent workflow |
-| Python | Application logic |
-| Groq | Model access |
-| pypdf | PDF processing |
-| JSON | Local schedule storage |
+| **HTML** | Web application structure |
+| **CSS** | UI design and layout |
+| **JavaScript** | Browser logic and interactions |
+| **Python** | Hosted API |
+| **Vercel** | Web/API deployment |
+| **pypdf** | PDF text extraction |
+| **Groq API** | LLM inference |
+| **gpt-oss-20b** | Research and content generation |
+| **Streamlit** | Local application |
+| **CrewAI** | Local agent workflow |
+| **localStorage** | Browser reminders |
 
 ---
 
-## ⚙️ Tech Stack Overview
+# 🖼️ Project Screenshots
 
-![Fieldnote Tech Stack](docs/images/fieldnote-tech-stack.png)
-
-A simple tech-stack diagram can show:
+Instead of adding images that may break because of incorrect paths, keep your screenshots in the repository:
 
 ```text
-                 FIELDNOTE
-                     │
-        ┌────────────┼────────────┐
-        │            │            │
-        ▼            ▼            ▼
-     FRONTEND       API         LOCAL APP
-        │            │            │
-   HTML/CSS/JS    Python      Streamlit
-                     │            │
-                     │          CrewAI
-                     │
-                 Vercel
-                     │
-                     ▼
+docs/
+└── images/
+    ├── fieldnote-ui.png
+    ├── generated-content.png
+    ├── x-post.png
+    ├── workflow.png
+    └── tech-stack.png
+```
+
+Then add them like this:
+
+### Main Interface
+
+<div align="center">
+
+<img src="docs/images/fieldnote-ui.png" width="900">
+
+</div>
+
+### Generated Content
+
+<div align="center">
+
+<img src="docs/images/generated-content.png" width="900">
+
+</div>
+
+### X Post
+
+<div align="center">
+
+<img src="docs/images/x-post.png" width="700">
+
+</div>
+
+### Workflow
+
+<div align="center">
+
+<img src="docs/images/workflow.png" width="900">
+
+</div>
+
+### Tech Stack
+
+<div align="center">
+
+<img src="docs/images/tech-stack.png" width="900">
+
+</div>
+
+---
+
+# 🌐 Hosted Version
+
+The web version is designed to run on **Vercel**.
+
+```text
+GitHub
+   │
+   ▼
+ Vercel
+   │
+   ├───────────────┐
+   │               │
+   ▼               ▼
+Frontend       Python API
+                   │
+                   ▼
                  pypdf
-                     │
-                     ▼
-                  Groq API
-                     │
-                     ▼
-             openai/gpt-oss-20b
+                   │
+                   ▼
+                Groq API
 ```
 
----
+### Environment Variables
 
-# 🌐 Hosted Web App
-
-The main version of Fieldnote is designed to run on Vercel.
-
-### Request flow
-
-```text
-Browser
-   │
-   │ POST /api/generate
-   ▼
-Python API
-   │
-   ├── Validate app password
-   │
-   ├── Validate PDF size
-   │
-   ├── Extract PDF text
-   │
-   ├── Limit extracted text
-   │
-   ├── Call Groq
-   │
-   └── Return generated content
-   │
-   ▼
-Browser
-```
-
-The browser checks that the uploaded PDFs are within the **4 MB total limit** before sending them to the API.
-
-The API extracts a maximum of **5,000 characters from each PDF** for the generation workflow.
-
----
-
-# 🔐 Environment Variables
-
-The hosted application expects:
+The application expects:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
 APP_PASSWORD=your_application_password
 ```
 
-The Groq API key is intended to remain **server-side**.
+Keep both values private.
 
-Do not put the Groq key directly inside `script.js`, HTML, or other browser-exposed files.
-
-For Vercel, add these values under:
-
-```text
-Vercel
-  → Project
-    → Settings
-      → Environment Variables
-```
-
-Then redeploy the project.
+The Groq key should remain on the server and should not be exposed in browser JavaScript.
 
 ---
 
-# 🚀 Running the Local Streamlit Version
+# 🚀 Run Locally
 
-The repository also contains an older local version based on Streamlit and CrewAI.
+The repository also contains the original Streamlit/CrewAI version.
 
-Make sure Python 3.12 is installed.
+### Requirements
 
-### 1. Clone the repository
+- Python 3.12
+- Groq API key
 
-```bash
+### Setup
+
+```powershell
 git clone <YOUR_REPOSITORY_URL>
+
 cd <YOUR_REPOSITORY_FOLDER>
-```
 
-### 2. Create a virtual environment
-
-```powershell
 python -m venv .venv
-```
 
-Activate it:
-
-```powershell
 .venv\Scripts\Activate.ps1
-```
 
-### 3. Install dependencies
-
-```powershell
 pip install -r requirements-streamlit.txt
 ```
 
-### 4. Create `.env`
-
-Create a `.env` file in the repository root:
+Create a `.env` file:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
 ```
 
-Keep this file private.
-
-### 5. Start Streamlit
+Then run:
 
 ```powershell
 streamlit run streamlit_app.py
 ```
 
-The application should then be available through the local Streamlit URL shown in the terminal.
+---
+
+# 🤖 Local CrewAI Workflow
+
+The Streamlit application follows a slightly different architecture from the hosted web app.
+
+```text
+                  RESEARCH PDF
+                       │
+                       ▼
+                Extract PDF Text
+                       │
+                       ▼
+              ┌─────────────────┐
+              │ Research Agent  │
+              │                 │
+              │ Understand the  │
+              │ supplied paper  │
+              └────────┬────────┘
+                       │
+                       │ Research output
+                       ▼
+              ┌─────────────────┐
+              │ Content Agent   │
+              │                 │
+              │ Turn research   │
+              │ into content    │
+              └────────┬────────┘
+                       │
+                       ▼
+                  FINAL DRAFT
+```
+
+The research agent's output becomes context for the content-writing task.
 
 ---
 
-# ☁️ Deploying to Vercel
+# 📅 Reminders & Scheduling
 
-The repository already contains Vercel configuration.
+Scheduling in Fieldnote is intentionally simple.
 
-### Deployment flow
+### Web version
 
-```text
-GitHub Repository
-       │
-       ▼
-    Vercel
-       │
-       ├── Build / Deploy
-       │
-       ▼
-Python API
-       │
-       ▼
-    Groq API
-```
-
-### Steps
-
-1. Import the repository into Vercel.
-2. Use the repository root as the project root.
-3. Add:
+The browser version stores reminders using:
 
 ```text
-GROQ_API_KEY
-APP_PASSWORD
+localStorage
 ```
 
-4. Select the environment in which the variables should be available.
-5. Deploy.
-6. Open the deployed application.
-7. Test PDF upload and generation.
-8. If generation fails, check the Vercel runtime logs.
+### Streamlit version
 
-> Having Vercel configuration in the repository does not by itself mean that a live deployment exists or is currently working.
+The local application stores scheduled information in:
+
+```text
+scheduled_posts.json
+```
+
+This is **not** a centralized publishing system.
+
+There is currently no:
+
+- Background publishing service
+- Cross-device schedule
+- Hosted publishing queue
+- Automatic X publishing
+
+The user remains responsible for the final post.
 
 ---
 
-# ⚠️ Current Hosted API Note
+# 🔐 Human-in-the-Loop
 
-There is currently an important implementation issue in the checked-in `api/generate.py`.
+This is an important part of Fieldnote.
 
-The Groq request currently uses:
+```text
+              AI
+               │
+               ▼
+          Generate Draft
+               │
+               ▼
+          USER REVIEWS
+               │
+          ┌────┴────┐
+          │         │
+        Edit      Reject
+          │
+          ▼
+       Review
+          │
+          ▼
+     Decide to Share
+```
+
+The model generates content.
+
+**The user makes the final call.**
+
+This is especially important when working with scientific material, where generated text should be checked against the original paper before being shared.
+
+---
+
+# ⚠️ Current Known Issue
+
+The checked-in hosted API currently contains an authentication issue in `api/generate.py`.
+
+The Groq request currently contains:
 
 ```python
 "Authorization": "******"
 ```
 
-instead of passing the API key as a bearer token.
+instead of using the supplied API key.
 
-The request should use the supplied API key, for example:
+It should use the API key as a bearer token:
 
 ```python
 "Authorization": f"Bearer {api_key}"
 ```
 
-Without the correct authorization header, the hosted API request to Groq is expected to fail authentication.
-
-This should be corrected before relying on the deployed generation workflow.
+Until this is corrected, the hosted generation request may fail authentication with Groq.
 
 ---
 
-# 🖥️ Project Structure
-
-A simplified view of the repository:
+# 📁 Project Structure
 
 ```text
 Fieldnote/
@@ -489,256 +587,79 @@ Fieldnote/
 │
 └── docs/
     └── images/
-        ├── fieldnote-interface.png
+        ├── fieldnote-ui.png
         ├── generated-content.png
-        ├── x-post-preview.png
-        ├── fieldnote-workflow.png
-        └── fieldnote-tech-stack.png
+        ├── x-post.png
+        ├── workflow.png
+        └── tech-stack.png
 ```
-
----
-
-# 🧩 Two Versions, Two Workflows
-
-Fieldnote currently contains two different implementations.
-
-### Web Version
-
-```text
-HTML
-CSS
-JavaScript
-   │
-   ▼
-Vercel Python API
-   │
-   ▼
-pypdf
-   │
-   ▼
-Groq
-```
-
-This is the version intended for deployment.
-
-### Streamlit Version
-
-```text
-Streamlit
-   │
-   ▼
-PDF Processing
-   │
-   ▼
-CrewAI
-   │
-   ├── Research Agent
-   │
-   └── Content Agent
-   │
-   ▼
-Groq
-```
-
-The two versions should be considered separate workflows rather than two interfaces for exactly the same backend.
-
----
-
-# 🤖 Streamlit / CrewAI Workflow
-
-The local application uses a CrewAI-based workflow.
-
-```text
-                 PDF
-                  │
-                  ▼
-           Extract PDF Text
-                  │
-                  ▼
-        ┌─────────────────────┐
-        │    Research Agent   │
-        │                     │
-        │ Understand research │
-        │ and identify useful │
-        │ information         │
-        └──────────┬──────────┘
-                   │
-                   │ Research output
-                   ▼
-        ┌─────────────────────┐
-        │   Content Agent     │
-        │                     │
-        │ Turn research into  │
-        │ readable content    │
-        └──────────┬──────────┘
-                   │
-                   ▼
-              Final Draft
-```
-
-The research task acts as context for the content-writing task.
-
----
-
-# 📅 Scheduling
-
-Fieldnote's scheduling feature is intentionally lightweight.
-
-The hosted web application stores reminders in:
-
-```text
-Browser localStorage
-```
-
-The Streamlit version stores its schedule in:
-
-```text
-scheduled_posts.json
-```
-
-This means the project does **not** currently provide:
-
-- Cross-device scheduling
-- Hosted job execution
-- Automatic posting
-- A centralized publishing queue
-- Background social-media publishing
-
-The reminder is there to help the user remember to review or share content.
-
----
-
-# 🛡️ Human Review
-
-One of the main design choices in Fieldnote is keeping the user in control.
-
-The workflow is:
-
-```text
-AI generates
-      ↓
-User reads
-      ↓
-User edits
-      ↓
-User checks claims
-      ↓
-User decides whether to publish
-```
-
-Fieldnote does not automatically publish the generated content to X.
-
-The X integration simply opens X with the prepared text so the user can make the final decision.
-
----
-
-# 🎯 Why Fieldnote?
-
-The idea is simple:
-
-**Research should not have to become less useful just because it needs to be communicated simply.**
-
-Fieldnote tries to make the first step from:
-
-```text
-Long research paper
-        ↓
-Understandable explanation
-        ↓
-Editable social content
-```
-
-a little easier.
-
-It is not intended to replace the paper, the researcher, or scientific review.
-
----
-
-# 🔮 Possible Future Improvements
-
-Some natural next steps for the project could include:
-
-- Better PDF parsing for complex papers
-- Section-aware extraction
-- Tables and figure extraction
-- Citation/reference preservation
-- Better claim verification
-- Paper metadata extraction
-- Multiple writing styles
-- Linked citations in generated content
-- User accounts
-- Cloud-based saved drafts
-- Cross-device reminders
-- Research-paper libraries
-- More social platforms
-- Background scheduling
-- Improved scientific fact checking
 
 ---
 
 # 📌 Current Limitations
 
-A few limitations are intentional or worth knowing:
-
-- PDF uploads are limited to **4 MB total** in the web workflow.
-- Text extraction is limited to **5,000 characters per PDF**.
-- Complex PDF layouts may not extract perfectly.
-- Generated content still requires human review.
-- The Streamlit dataset upload controls are present, but the current generation flow does not process those datasets.
-- Image-related CrewAI files exist, but the configured crew currently runs the research and content tasks rather than an image-generation task.
-- Scheduling is local/browser-based rather than a hosted publishing system.
-- The hosted Groq authorization header needs to be corrected before the main generation workflow can work reliably.
+- Maximum **4 MB** total PDF upload in the web application
+- Maximum **5,000 characters extracted per PDF**
+- Complex PDF layouts may not extract perfectly
+- Generated content requires human review
+- Dataset upload controls exist in the Streamlit UI, but the current generation flow does not process those datasets
+- Image-related CrewAI files exist, but the configured crew currently focuses on research and content tasks
+- Scheduling is local/browser-based
+- The web version requires the Groq authorization header to be corrected
 
 ---
 
-# 📄 Project Philosophy
+# 🔮 What's Next?
 
-Fieldnote is built around a simple idea:
+Some possible improvements:
 
-> **Use AI to help communicate research, while keeping the human responsible for the final message.**
-
-The model helps with the transformation.
-
-The user remains responsible for reviewing the science.
-
----
-
-## Built With
-
-**Frontend**
-
-HTML · CSS · JavaScript
-
-**Backend**
-
-Python · Vercel
-
-**Research Processing**
-
-pypdf
-
-**AI**
-
-Groq · openai/gpt-oss-20b
-
-**Local Workflow**
-
-Streamlit · CrewAI
-
-**Browser Storage**
-
-localStorage
+- Better PDF structure extraction
+- Tables and figure extraction
+- Paper metadata extraction
+- Citation-aware generation
+- Claim verification
+- Section-level paper analysis
+- Multiple content styles
+- Saved research libraries
+- User accounts
+- Cloud-based drafts
+- Cross-device reminders
+- Additional social platforms
 
 ---
 
-## 👨‍💻 Project
+# 🎯 The Idea Behind Fieldnote
 
-Fieldnote is a project focused on making scientific communication more approachable without removing the human from the process.
+Fieldnote started from a simple problem:
 
-If you find an issue, have an idea, or want to improve the workflow, feel free to open an issue or contribute to the project.
+**Research is valuable, but communicating research clearly takes time.**
+
+The project tries to shorten that gap without removing the person responsible for the final message.
+
+```text
+Research
+   ↓
+Understand
+   ↓
+Draft
+   ↓
+Review
+   ↓
+Share
+```
+
+The AI helps with the middle.
+
+**The human stays in the loop.**
 
 ---
 
-### Fieldnote
+<div align="center">
 
-**Read the research. Understand it. Edit it. Then decide what to share.**
+## 🔬 Fieldnote
+
+**Research → Understanding → Communication**
+
+Made for turning complex research into something people can actually read.
+
+</div>
